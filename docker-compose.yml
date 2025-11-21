@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: algohoot_db_container
+    environment:
+      POSTGRES_DB: algohoot_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev-password
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d algohoot_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: algohoot_backend_container
+    depends_on:
+      db:
+        condition: service_healthy 
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/algohoot_db"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: dev-password
+
+  frontend:
+    build: ./frontend
+    container_name: algohoot_frontend
+    environment:
+      - VITE_API_URL=http://ingress/api
+
+  ingress:
+    build: ./ingress
+    container_name: algohoot_ingress
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+
+  adminer:
+    image: adminer:5.4.0
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
