@@ -1,0 +1,56 @@
+# FRONTEND
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# BACKEND
+/target/
+/build/
+/out/
+
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+*.jar
+*.war
+*.ear
+
+logs/
+*.log
+*.tmp
+*.temp
+*.db
+*.sqlite
+
+logs/
+*.log
+*.tmp
+*.temp
+*.db
+*.sqlite
+
+# DATOS GENERADOS
+data
+
+# EDITOR & SISTEMA
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+Thumbs.db
+ehthumbs.db
