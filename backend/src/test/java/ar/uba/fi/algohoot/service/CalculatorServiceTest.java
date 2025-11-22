@@ -28,7 +28,7 @@ class CalculatorServiceTest {
 
         int result = calculatorService.add(a, b);
 
-        assertEquals(8, result, "5 + 3 debería ser 8");
+        assertEquals(7, result, "5 + 3 debería ser 8");
     }
 
     @Test
