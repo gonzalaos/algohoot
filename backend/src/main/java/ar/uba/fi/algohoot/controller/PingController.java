@@ -1,4 +1,4 @@
-package ar.uba.fi.algohoot.controllers;
+package ar.uba.fi.algohoot.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
