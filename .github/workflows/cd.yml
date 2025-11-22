@@ -5,15 +5,14 @@ on:
     branches: [ "main" ]
 
 env:
-  # Define tu registro y propietario de la imagen
   REGISTRY: ghcr.io
   IMAGE_OWNER: ${{ github.repository_owner }}
 
 jobs:
-  # 💡 La dependencia 'needs: build-and-test' asegura que solo se ejecute si el CI pasó
   push_to_registry:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
+    needs: build-and-test
     
     permissions:
       contents: read
@@ -28,34 +27,65 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # --- 2. SETUP BUILDX (Herramienta de Construcción Avanzada) ---
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
-      # --- 3. CONSTRUCCIÓN Y PUSH DEL BACKEND ---
+      # --- 3. METADATOS PARA IMÁGENES ---
+      - name: Extract metadata for Backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-backend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            latest
+
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-frontend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            latest
+
+      - name: Extract metadata for Ingress
+        id: meta-ingress
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-ingress
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            latest
+
+      # --- 4. CONSTRUCCIÓN Y PUSH ---
       - name: Build and push Backend image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          # Etiqueta completa: ghcr.io/tu-usuario/algohoot-backend:latest
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-backend:latest
-          
-      # --- 4. CONSTRUCCIÓN Y PUSH DEL FRONTEND ---
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-frontend:latest
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
           
-      # --- 5. CONSTRUCCIÓN Y PUSH DEL INGRESS ---
       - name: Build and push Ingress image
         uses: docker/build-push-action@v5
         with:
           context: ./ingress
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-ingress:latest
+          tags: ${{ steps.meta-ingress.outputs.tags }}
+          labels: ${{ steps.meta-ingress.outputs.labels }}
