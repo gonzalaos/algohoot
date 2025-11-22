@@ -1,0 +1,63 @@
+name: CD - Build and Push to GHCR
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  # Define tu registro y propietario de la imagen
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  # 💡 La dependencia 'needs: build-and-test' asegura que solo se ejecute si el CI pasó
+  push_to_registry:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    
+    needs: build-and-test
+    
+    permissions:
+      contents: read
+      packages: write 
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --- 1. LOGIN EN GHCR (Usa los Secrets configurados) ---
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # --- 2. SETUP BUILDX (Herramienta de Construcción Avanzada) ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      # --- 3. CONSTRUCCIÓN Y PUSH DEL BACKEND ---
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          # Etiqueta completa: ghcr.io/tu-usuario/algohoot-backend:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-backend:latest
+          
+      # --- 4. CONSTRUCCIÓN Y PUSH DEL FRONTEND ---
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-frontend:latest
+          
+      # --- 5. CONSTRUCCIÓN Y PUSH DEL INGRESS ---
+      - name: Build and push Ingress image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ingress
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/algohoot-ingress:latest
