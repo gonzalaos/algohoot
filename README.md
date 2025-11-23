@@ -60,6 +60,12 @@ Navegador → http://localhost (Nginx:80)\
 
 ## Comandos de Desarrollo
 
+### **Levantar backend:**
+```bash
+docker compose up db -d
+mvn spring-boot:run
+```
+
 ### **Levantar entorno completo:**
 ```bash
 docker compose up -d --build

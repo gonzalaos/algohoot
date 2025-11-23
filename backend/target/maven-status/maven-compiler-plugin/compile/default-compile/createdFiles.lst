@@ -1,0 +1,11 @@
+ar/uba/fi/algohoot/controller/PlayerController.class
+ar/uba/fi/algohoot/service/CalculatorService.class
+ar/uba/fi/algohoot/repository/PlayerRepository.class
+ar/uba/fi/algohoot/model/Player$PlayerBuilder.class
+ar/uba/fi/algohoot/model/Player.class
+ar/uba/fi/algohoot/exception/PlayerAlreadyExistsException.class
+ar/uba/fi/algohoot/dto/PlayerCreateDTO.class
+ar/uba/fi/algohoot/AlgohootApplication.class
+ar/uba/fi/algohoot/exception/GlobalExceptionHandler.class
+ar/uba/fi/algohoot/controller/PingController.class
+ar/uba/fi/algohoot/service/PlayerService.class

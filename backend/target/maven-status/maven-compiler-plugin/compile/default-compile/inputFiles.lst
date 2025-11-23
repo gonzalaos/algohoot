@@ -1,0 +1,10 @@
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/AlgohootApplication.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/controller/PingController.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/controller/PlayerController.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/dto/PlayerCreateDTO.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/exception/GlobalExceptionHandler.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/exception/PlayerAlreadyExistsException.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/model/Player.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/repository/PlayerRepository.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/service/CalculatorService.java
+/home/gonzalo/Documentos/algohoot/backend/src/main/java/ar/uba/fi/algohoot/service/PlayerService.java
