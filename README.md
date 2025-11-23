@@ -65,6 +65,7 @@ Navegador → http://localhost (Nginx:80)\
 docker compose up db -d
 mvn spring-boot:run
 ```
+Swagger: http://localhost:8080/swagger-ui/index.html
 
 ### **Levantar entorno completo:**
 ```bash
