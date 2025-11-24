@@ -1,0 +1,214 @@
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========== TARJETA PRINCIPAL ========== */
+.home-card {
+  background: rgba(29, 36, 48, 1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== HEADER ========== */
+.home-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+}
+
+.home-subtitle {
+  color: #9CA3AF;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* ========== INFORMACIÓN DEL JUGADOR ========== */
+.player-info {
+  background: rgba(79, 70, 229, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.player-info p {
+  color: white;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.player-info small {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+}
+
+/* ========== FORMULARIO ========== */
+.input-group {
+  margin-bottom: 2.25rem;
+}
+
+/* ========== CONTENEDOR DEL INPUT CON ÍCONO ========== */
+.input-wrapper {
+  position: relative; /* Necesario para posicionar el ícono absolutamente */
+  display: flex;
+  align-items: center;
+}
+
+.error-icon {
+  position: absolute;
+  right: 12px;
+  background: #EF4444;
+  color: rgba(29, 36, 48, 1);
+  border-radius: 50%;
+  width: 20px; 
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* ========== INPUT ========== */
+.username-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #4B5563;
+  border-radius: 8px;
+  background: rgba(29, 36, 48, 1);
+  color: white;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.username-input:focus {
+  outline: none;
+  border-color: #3c35b8;
+}
+
+.username-input.input-error {
+  border-color: #EF4444;
+  background: rgb(40, 50, 66);
+  color: white;
+}
+
+.username-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== MENSAJES DE ERROR Y SUGERENCIAS ========== */
+.error-message {
+  display: block;
+  color: #EF4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.suggestions {
+  margin-top: 0.5rem;
+}
+
+.suggestions small {
+  color: #9CA3AF;
+}
+
+/* ========== BOTONES ========== */
+.primary-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #4338CA;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.primary-button:disabled {
+  background: #6B7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.secondary-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: #F59E0B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #D97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-button:disabled {
+  background: #6B7280;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ========== FOOTER ========== */
+.home-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.home-footer small {
+  color: #6B7280;
+  font-size: 0.75rem;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 480px) {
+  .home-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .home-title {
+    font-size: 2rem;
+  }
+}

@@ -34,7 +34,7 @@ services:
     build: ./frontend
     container_name: algohoot_frontend
     environment:
-      - VITE_API_URL=http://ingress/api
+      - VITE_API_URL=http://localhost/api
 
   ingress:
     build: ./ingress
