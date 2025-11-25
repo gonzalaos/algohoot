@@ -13,9 +13,9 @@ dist-ssr/
 *.local
 
 # BACKEND
-/target/
-/build/
-/out/
+target/
+build/
+out/
 
 .mvn/
 !.mvn/wrapper/maven-wrapper.jar

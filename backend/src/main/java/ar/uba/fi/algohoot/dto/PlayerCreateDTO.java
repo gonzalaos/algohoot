@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 public record PlayerCreateDTO(
     @NotBlank(message = "Username is required")
     @Size(max = 20, message = "Username must not exceed 20 characters")
+    @Size(min = 3, message = "Username must be at least 3 characters")
     String username
 ) {
     public Player toEntity() {
