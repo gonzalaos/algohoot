@@ -1,0 +1,80 @@
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========== HEADER ========== */
+.home-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+}
+
+.home-subtitle {
+  color: #9CA3AF;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* ========== INFORMACIÓN DEL JUGADOR ========== */
+.player-info {
+  background: rgba(79, 70, 229, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.player-info p {
+  color: white;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.player-info small {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+}
+
+/* ========== FORMULARIO ========== */
+.input-group {
+  margin-bottom: 2.25rem;
+}
+
+.suggestions {
+  margin-top: 0.5rem;
+}
+
+.suggestions small {
+  color: #9CA3AF;
+}
+
+/* ========== FOOTER ========== */
+.home-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.home-footer small {
+  color: #6B7280;
+  font-size: 0.75rem;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 480px) {
+  .home-title {
+    font-size: 2rem;
+  }
+}
