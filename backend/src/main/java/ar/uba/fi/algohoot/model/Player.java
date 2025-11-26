@@ -1,6 +1,7 @@
 package ar.uba.fi.algohoot.model;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 @Data
