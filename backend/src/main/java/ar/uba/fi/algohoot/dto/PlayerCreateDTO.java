@@ -13,6 +13,7 @@ public record PlayerCreateDTO(
 ) {
     public Player toEntity() {
         Player player = Player.builder().username(username).build();
+        
         return player;
     }
 

@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+@Entity
+@Table(name = "players")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "players")
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,6 +7,7 @@ import ar.uba.fi.algohoot.model.Player;
 import ar.uba.fi.algohoot.repository.PlayerRepository;
 import ar.uba.fi.algohoot.dto.PlayerCreateDTO;
 import ar.uba.fi.algohoot.exception.PlayerAlreadyExistsException;
+import ar.uba.fi.algohoot.exception.PlayerNotExist;
 
 @Service
 public class PlayerService {
@@ -25,5 +26,10 @@ public class PlayerService {
 
     public boolean existsPlayer(String username) {
         return playerRepository.existsByUsername(username);
+    }
+
+    public Player findPlayer(Long id) {
+        return playerRepository.findById(id)
+            .orElseThrow(() -> new PlayerNotExist("Player with id " + id +  " not found"));
     }
 }
