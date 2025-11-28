@@ -1,19 +1,19 @@
 import { useMutation } from '@tanstack/react-query'
 import { BASE_API_URL } from '../config/app-query-client'
-import { type Player, PlayerSchema, type PlayerCreateRequest, PlayerCreateSchema } from '../types/Player'
+import { type Game, GameSchema, type GameCreateRequest, GameCreateSchema } from '../types/Game'
 
-export function usePlayerCreate() {
+export function useGameCreate() {
   return useMutation({
-    mutationFn: async (data: PlayerCreateRequest): Promise<Player> => {
-      const validatedData = PlayerCreateSchema.parse(data)
+    mutationFn: async (data: GameCreateRequest): Promise<Game> => {
+      const validatedData = GameCreateSchema.parse(data)
 
-      const response = await fetch(`${BASE_API_URL}/player`, {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(validatedData),
+      const response = await fetch(`${BASE_API_URL}/game`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(validatedData),
       })
 
       if(!response.ok) {
@@ -32,7 +32,7 @@ export function usePlayerCreate() {
       }
 
       const reponseData = await response.json()
-      return PlayerSchema.parse(reponseData)
+      return GameSchema.parse(reponseData)
     }
   })
 }

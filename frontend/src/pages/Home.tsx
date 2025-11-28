@@ -1,63 +1,68 @@
 import React, {useCallback, useState} from 'react'
-import { usePlayerCreate } from '../services/PlayerServices'
-import { type Player, PlayerCreateSchema } from '../types/Player'
+import { useGameCreate } from '../services/GameServices'
+import { type Game, GameCreateSchema } from '../types/Game'
 import { ZodError } from 'zod'
 import { Button } from '../components/Button/Button'
 import { Input } from '../components/Input/Input'
 import { Card } from '../components/Card/Card'
-import '../styles/home/Home.css'
+import { useLocation } from 'wouter'
+import '../styles/Home.css'
 
 const Home: React.FC = () => {
   const [username, setUsername] = useState<string>('')
-  const [player, setPlayer] = useState<Player | null>(null)
+  const [game, setGame] = useState<Game | null>(null)
   const [submitted, setSubmitted] = useState<boolean>(false)
   const [validationError, setValidationError] = useState<string | null>(null)
 
-  const { mutate: createPlayer, error: mutationError, isPending: loading, reset } = usePlayerCreate()
+  const { mutate: createGame, error: createGameError, isPending: loadingGame, reset } = useGameCreate()
+
+  const [, navigate] = useLocation();
 
   const handleSubmit = useCallback(async(event: React.FormEvent) => {
       event.preventDefault()
-      if (loading || !!player) return;
+      if (loadingGame || game) return;
+
       setSubmitted(true)
       setValidationError(null)
 
       try {
-        PlayerCreateSchema.parse({ username })
-        createPlayer(
+        GameCreateSchema.parse({username})
+        createGame(
           { username },
           {
-            onSuccess: (newPlayer) => {
-              setPlayer(newPlayer);
-              console.log('Usuario creado:', newPlayer)
-            },
+            onSuccess:(newGame) => {
+              console.log("Game created:", newGame);
+              setGame(newGame)
+              navigate('/lobby')
+            }
           }
-        );
-      } catch (error) {
-        if (error instanceof ZodError) {
+        )
+      } catch(error) {
+        if(error instanceof ZodError) {
           const firstError = error.issues[0]
           setValidationError(firstError.message)
         }
       }
     },
-    [username, createPlayer, loading, player]
+    [username, createGame, loadingGame, game, navigate]
   )
 
   const handleUsernameChange = useCallback((value: string): void => {
     setUsername(value)
-    if (submitted || validationError || mutationError) {
+    if (submitted || validationError || createGameError) {
       setSubmitted(false)
       setValidationError(null)
       reset()
     }
-  }, [submitted, validationError, mutationError, reset])
+  }, [submitted, validationError, createGameError, reset])
 
   const error = React.useMemo(() => {
     if (!submitted) return null
     if (!username.trim()) return 'Ingresa un nombre de usuario.'
     if (validationError) return validationError
-    if (mutationError) return mutationError.message
+    if (createGameError) return createGameError.message
     return null
-  }, [username, mutationError, validationError, submitted])
+  }, [username, createGameError, validationError, submitted])
 
   const showSuggestions = error && error.includes('ya está en uso')
 
@@ -69,15 +74,6 @@ const Home: React.FC = () => {
           <p className="home-subtitle">¡Bienvenido al Juego!</p>
         </div>
 
-        {player && (
-          <div className="player-info">
-            <p>¡Hola, <strong>{player.username}</strong>!</p>
-            <small>
-              ID: {player.id} • 
-            </small>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="home-form">
           <div className="input-group">
             <Input
@@ -86,7 +82,7 @@ const Home: React.FC = () => {
               value={username}
               onChange={handleUsernameChange}
               error={error}
-              disabled={loading || !!player}
+              disabled={loadingGame || !!game}
             />
             {showSuggestions && (
               <div className="suggestions">
@@ -98,16 +94,16 @@ const Home: React.FC = () => {
           <Button
             type="submit"
             variant="primary"
-            disabled={loading || !!player}
-            loading={loading}  
+            disabled={loadingGame || !!game}
+            loading={loadingGame}  
           >
-            🚀 COMENZAR A JUGAR
+            🚀 CREAR PARTIDA
           </Button>
         </form>
 
         <Button 
           variant="secondary"
-          disabled={loading || !!player}
+          disabled={loadingGame || !!game}
         >
           🔗 UNIRSE A PARTIDA
         </Button>

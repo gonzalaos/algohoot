@@ -1,27 +1,31 @@
 package ar.uba.fi.algohoot.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import ar.uba.fi.algohoot.dto.CreateGameRequestDTO;
+import ar.uba.fi.algohoot.dto.CreateGameResponseDTO;
 import ar.uba.fi.algohoot.model.Game;
 import ar.uba.fi.algohoot.model.Player;
 import ar.uba.fi.algohoot.repository.GameRepository;
-import ar.uba.fi.algohoot.dto.GameCreateDto;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class GameService {
-    @Autowired
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    @Autowired
-    private PlayerService playerService;
+    private final PlayerService playerService;
 
-    public Game createGame(GameCreateDto gameCreateDTO) {
-        Player host_player = findIdHostPlayer(gameCreateDTO.idHostPlayer());
+    @Transactional
+    public CreateGameResponseDTO createGame(CreateGameRequestDTO requestDTO) {
+        Player hostPlayer = playerService.identifyPlayer(requestDTO);
 
-        Game game = gameCreateDTO.toEntity(host_player);
+        Game newGame = requestDTO.toEntityGame(hostPlayer);
+        newGame = gameRepository.save(newGame);
 
-        return gameRepository.save(game);
+        return CreateGameResponseDTO.builder().gameId(newGame.getId()).hostPlayerId(hostPlayer.getId()).build();
     }
 
     public Player findIdHostPlayer(Long id) {

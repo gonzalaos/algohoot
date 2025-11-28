@@ -2,7 +2,10 @@ package ar.uba.fi.algohoot.model.Question;
 
 import jakarta.persistence.*;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "pregunta_opcion")

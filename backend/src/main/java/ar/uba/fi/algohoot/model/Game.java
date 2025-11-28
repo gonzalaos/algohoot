@@ -2,11 +2,15 @@ package ar.uba.fi.algohoot.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import java.util.*;
-
 import jakarta.persistence.*;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "games")
