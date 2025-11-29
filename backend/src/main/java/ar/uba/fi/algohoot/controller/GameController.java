@@ -1,7 +1,7 @@
 package ar.uba.fi.algohoot.controller;
 
 import ar.uba.fi.algohoot.dto.CreateGameRequestDTO;
-import ar.uba.fi.algohoot.dto.CreateGameResponseDTO;
+import ar.uba.fi.algohoot.dto.JoinGameRequestDTO;
 import ar.uba.fi.algohoot.service.GameService;
 
 import jakarta.validation.Valid;
@@ -23,7 +23,13 @@ public class GameController {
 
     @PostMapping
     public ResponseEntity<?> createGame(@Valid @RequestBody CreateGameRequestDTO requestDTO) {
-        CreateGameResponseDTO responseDTO = gameService.createGame(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        var response = gameService.createGame(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGame(@Valid @RequestBody JoinGameRequestDTO requestDTO) {
+        var response = gameService.joinGame(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

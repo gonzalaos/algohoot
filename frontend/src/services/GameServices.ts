@@ -1,38 +1,86 @@
 import { useMutation } from '@tanstack/react-query'
 import { BASE_API_URL } from '../config/app-query-client'
-import { type Game, GameSchema, type GameCreateRequest, GameCreateSchema } from '../types/Game'
+import { type Game, GameSchema, type GameCreateRequest, GameCreateSchema, 
+  type GameJoinRequest, GameJoinSchema,
+} from '../types/Game'
+
+const translateBackendError = (message: string, status: number): string => {
+  const msgLower = message.toLowerCase()
+  
+  if (msgLower.includes("no game was found") || msgLower.includes("code not exist")) {
+    return "No se encontró una partida con ese código."
+  }
+
+  if (msgLower.includes("already taken") || msgLower.includes("username")) {
+    return "Este nombre ya está en uso en esta partida."
+  }
+
+  if (msgLower.includes("started") || msgLower.includes("full")) {
+    return "La partida ya ha comenzado o está llena."
+  }
+
+  if (status === 500) return "Error interno del servidor."
+  if (status === 400) return "Datos inválidos. Verifica la información."
+
+  return message || "Ocurrió un error inesperado."
+}
 
 export function useGameCreate() {
   return useMutation({
     mutationFn: async (data: GameCreateRequest): Promise<Game> => {
-      const validatedData = GameCreateSchema.parse(data)
+      GameCreateSchema.parse(data)
 
-      const response = await fetch(`${BASE_API_URL}/game`, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(validatedData),
-      })
+      try {
+        const response = await fetch(`${BASE_API_URL}/game`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
 
-      if(!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-
-        switch (response.status) {
-          case 400:
-            throw new Error('Datos inválidos. Por favor verifica la información.')
-          case 409:
-            throw new Error('Este nombre de usuario ya está en uso. Por favor elige otro.')
-          case 500:
-            throw new Error('Error del servidor.')
-          default:
-            throw new Error(errorData.message || `Error ${response.status}`)
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(translateBackendError(errorData.message || "", response.status))
         }
-      }
 
-      const reponseData = await response.json()
-      return GameSchema.parse(reponseData)
+        const responseData = await response.json()
+        return GameSchema.parse(responseData)
+
+      } catch (error: any) {
+        if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+           throw new Error('Error de conexión. Intenta nuevamente.')
+        }
+        throw error
+      }
+    }
+  })
+}
+
+export function useGameJoin() {
+  return useMutation({
+    mutationFn: async (data: GameJoinRequest): Promise<Game> => {
+      GameJoinSchema.parse(data)
+
+      try {
+        const response = await fetch(`${BASE_API_URL}/game/join`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(translateBackendError(errorData.message || "", response.status))
+        }
+
+        const responseData = await response.json()
+        return GameSchema.parse(responseData)
+
+      } catch (error: any) {
+        if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+           throw new Error('Error de conexión. Intenta nuevamente.')
+        }
+        throw error
+      }
     }
   })
 }

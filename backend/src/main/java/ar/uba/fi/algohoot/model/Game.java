@@ -24,7 +24,10 @@ public class Game {
     private Long id;
 
     @ManyToOne(optional = false)
-    private Player host;
+    private Player playerHost;
+
+    @Column(unique = true, nullable = false, length = 6)
+    private String code;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -39,6 +42,18 @@ public class Game {
     @Builder.Default
     @JsonManagedReference
     private List<GamePlayer> participants = new ArrayList<>();
+
+    public boolean isUsernameTaken(String usernameToCheck) {
+        if(usernameToCheck == null) 
+            return false;
+
+        if(playerHost.getUsername().equalsIgnoreCase(usernameToCheck)) 
+            return true;
+
+        return participants.stream()
+            .map(gamePlayer -> gamePlayer.getPlayer().getUsername())
+            .anyMatch(name -> name.equalsIgnoreCase(usernameToCheck));
+    }
 
     public void addPlayer(Player player) {
         GamePlayer gp = GamePlayer.builder()

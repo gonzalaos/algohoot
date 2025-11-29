@@ -1,70 +1,117 @@
-import React, {useCallback, useState} from 'react'
-import { useGameCreate } from '../services/GameServices'
-import { type Game, GameCreateSchema } from '../types/Game'
+import React, {useCallback, useState, useMemo} from 'react'
+import { useLocation } from 'wouter'
 import { ZodError } from 'zod'
+
+import { useGameCreate, useGameJoin } from '../services/GameServices'
+import { GameCreateSchema, GameJoinSchema } from '../types/Game'
+
 import { Button } from '../components/Button/Button'
 import { Input } from '../components/Input/Input'
 import { Card } from '../components/Card/Card'
-import { useLocation } from 'wouter'
+
 import '../styles/Home.css'
 
 const Home: React.FC = () => {
-  const [username, setUsername] = useState<string>('')
-  const [game, setGame] = useState<Game | null>(null)
+  const [isJoinMode, setIsJoinMode] = useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
-  const [validationError, setValidationError] = useState<string | null>(null)
 
-  const { mutate: createGame, error: createGameError, isPending: loadingGame, reset } = useGameCreate()
+  const [username, setUsername] = useState<string>('')
+  const [gameCode, setGameCode] = useState<string>('')
 
+  const [validationError, setValidationError] = useState<{username?: string, code?: string} | null>(null)
+
+  const { mutate: createGame, isPending: loadingCreate, reset: resetCreate, error: createError } = useGameCreate()
+  const { mutate: joinGame, isPending: loadingJoin, reset: resetJoin, error: joinError } = useGameJoin()
+
+  const loading = loadingCreate || loadingJoin
+  const backendError = createError || joinError
   const [, navigate] = useLocation();
+
+  const toggleMode = (mode: boolean) => {
+    if(loading) return
+    setUsername('')
+    setGameCode('')
+    setSubmitted(false)
+    setIsJoinMode(mode)
+    setValidationError(null)
+    resetCreate()
+    resetJoin()
+  }
 
   const handleSubmit = useCallback(async(event: React.FormEvent) => {
       event.preventDefault()
-      if (loadingGame || game) return;
+      if (loading) return;
 
       setSubmitted(true)
       setValidationError(null)
+      resetCreate()
+      resetJoin()
 
       try {
-        GameCreateSchema.parse({username})
-        createGame(
-          { username },
-          {
-            onSuccess:(newGame) => {
-              console.log("Game created:", newGame);
-              setGame(newGame)
-              navigate('/lobby')
+        if(isJoinMode) {
+          GameJoinSchema.parse({username, gameCode})
+          joinGame({username, gameCode}, {
+            onSuccess: (response) => {
+              console.log("Joined game:", response)
+              navigate(`/lobby/${response.gameId}`)
+            },
+          })
+        } else {
+          GameCreateSchema.parse({username})
+          createGame({username}, {
+            onSuccess: (newGame) => {
+              console.log("Game created:", newGame)
+              navigate(`/lobby/${newGame.gameId}`)
             }
-          }
-        )
+          })
+        }
       } catch(error) {
         if(error instanceof ZodError) {
-          const firstError = error.issues[0]
-          setValidationError(firstError.message)
+          const fieldErrors: {username?: string, code?: string} = {}
+          error.issues.forEach(issue => {
+            if (issue.path.includes('username')) fieldErrors.username = issue.message
+            if (issue.path.includes('gameCode')) fieldErrors.code = issue.message
+          })
+          setValidationError(fieldErrors)
         }
       }
     },
-    [username, createGame, loadingGame, game, navigate]
-  )
+    [username, gameCode, isJoinMode, createGame, joinGame, loading, navigate, resetCreate, resetJoin])
 
-  const handleUsernameChange = useCallback((value: string): void => {
-    setUsername(value)
-    if (submitted || validationError || createGameError) {
-      setSubmitted(false)
-      setValidationError(null)
-      reset()
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (value: string) => {
+    setter(value)
+    if (backendError) {
+      resetCreate()
+      resetJoin()
     }
-  }, [submitted, validationError, createGameError, reset])
+    if (validationError) setValidationError(null)
+  }
 
-  const error = React.useMemo(() => {
-    if (!submitted) return null
-    if (!username.trim()) return 'Ingresa un nombre de usuario.'
-    if (validationError) return validationError
-    if (createGameError) return createGameError.message
-    return null
-  }, [username, createGameError, validationError, submitted])
+  const displayErrors = useMemo(() => {
+    const result = { username: '', code: '', global: '' }
 
-  const showSuggestions = error && error.includes('ya está en uso')
+    if(submitted) {
+      if(!username.trim()) result.username = 'Ingresa un nombre de usuario.'
+      if(isJoinMode && !gameCode.trim()) result.code = 'Ingresa el código de la partida.'
+    }
+
+    if(!result.username && validationError?.username) result.username = validationError.username
+    if(!result.code && validationError?.code) result.code = validationError.code
+
+    if(backendError) {
+      const msg = backendError.message.toLowerCase()
+
+      if(msg.includes('nombre') || msg.includes('username')) {
+        if(!result.username) result.username = backendError.message
+      } else if(msg.includes('código') || msg.includes('partida') || msg.includes('game')) {
+        if(!result.code) result.code = backendError.message
+      } else {
+        result.global = backendError.message
+      }
+    }
+
+    return result
+  }, [username, gameCode, submitted, isJoinMode, validationError, backendError])
 
   return (
     <div className="home-container">
@@ -74,45 +121,67 @@ const Home: React.FC = () => {
           <p className="home-subtitle">¡Bienvenido al Juego!</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="home-form">
-          <div className="input-group">
+        <div className="mode-toggle-container">
+          <button
+            type="button"
+            className={`toggle-btn ${!isJoinMode ? 'active create' : ''}`}
+            onClick={() => toggleMode(false)}
+          >
+            Crear Partida
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${isJoinMode ? 'active join' : ''}`}
+            onClick={() => toggleMode(true)}
+          >
+            Unirse a Partida
+          </button>
+        </div>
+
+        <form 
+          onSubmit={handleSubmit}
+          className={`home-form ${isJoinMode ? 'join-mode' : ''}`}
+        >
+          <div className={`input-group${isJoinMode ? '-join' : ''}`}>
             <Input
               type="text"
               placeholder="Elige tu nombre de jugador"
               value={username}
-              onChange={handleUsernameChange}
-              error={error}
-              disabled={loadingGame || !!game}
+              onChange={handleInputChange(setUsername)}
+              error={displayErrors.username || undefined}
+              disabled={loading}
             />
-            {showSuggestions && (
-              <div className="suggestions">
-                <small>Sugerencia: ¿Qué tal {username}_123?</small>
-              </div>
-            )}
           </div>
+
+          {isJoinMode && (
+            <div className="input-group slide-in-animation">
+              <Input
+                type="text"
+                placeholder="Ingresa el código de partida"
+                value={gameCode}
+                onChange={handleInputChange(setGameCode)}
+                error={displayErrors.code || undefined}
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {displayErrors.global && (
+            <div className="global-error-message" style={{ color: '#ff4d4f', marginBottom: '10px', fontSize: '0.9rem', textAlign: 'center' }}>
+              {displayErrors.global}
+            </div>
+          )}
 
           <Button
             type="submit"
-            variant="primary"
-            disabled={loadingGame || !!game}
-            loading={loadingGame}  
+            variant={isJoinMode ? 'secondary' : 'primary'}
+            disabled={loading}
+            loading={loading}
+            className={isJoinMode ? 'btn-join' : 'btn-create'}
           >
-            🚀 CREAR PARTIDA
+            {isJoinMode ? '🔗 UNIRSE A PARTIDA' : '🚀 COMENZAR A JUGAR'}
           </Button>
         </form>
-
-        <Button 
-          variant="secondary"
-          disabled={loadingGame || !!game}
-        >
-          🔗 UNIRSE A PARTIDA
-        </Button>
-
-        <div className="home-footer">
-          <small>
-            Al ingresar tu nombre, podrás crear partidas o unirte a existentes.
-          </small>
-        </div>
       </Card>
     </div>
 	)

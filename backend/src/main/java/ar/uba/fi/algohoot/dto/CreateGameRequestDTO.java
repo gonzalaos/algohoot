@@ -13,12 +13,8 @@ public record CreateGameRequestDTO(
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters", groups = SizeGroup.class) 
     String username
 ) {
-    public Player toEntityPlayer() {
-        return Player.builder().username(username).build();
-    }
-
-    public Game toEntityGame(Player hostPlayer) {
-        Game game = Game.builder().host(hostPlayer).build();
+    public Game toEntityGame(Player hostPlayer, String uniqueCode) {
+        Game game = Game.builder().playerHost(hostPlayer).code(uniqueCode).build();
         game.addPlayer(hostPlayer);
         return game;
     }

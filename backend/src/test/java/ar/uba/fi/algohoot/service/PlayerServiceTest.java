@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ar.uba.fi.algohoot.dto.CreateGameRequestDTO;
-import ar.uba.fi.algohoot.exception.PlayerAlreadyExistsException;
 import ar.uba.fi.algohoot.model.Player;
 import ar.uba.fi.algohoot.repository.PlayerRepository;
 
@@ -24,31 +23,14 @@ public class PlayerServiceTest {
     private PlayerService playerService;
 
     @Test
-    public void identifyNewPlayerTest() {
+    public void createNewPlayerTest() {
         CreateGameRequestDTO requestDTO = new CreateGameRequestDTO("Gonza25");
         Player expected = Player.builder().username("Gonza25").build();
-        when(playerRepository.existsByUsername("Gonza25")).thenReturn(false);
         when(playerRepository.save(any(Player.class))).thenReturn(expected);
 
-        Player result = playerService.identifyPlayer(requestDTO);
+        Player result = playerService.createPlayer(requestDTO.username());
 
         assertEquals(expected.getUsername(), result.getUsername());
-        verify(playerRepository).existsByUsername("Gonza25");
         verify(playerRepository).save(any(Player.class));
     }    
-
-    @Test
-    public void identifyPlayerWithDuplicateUsernameThrowsExceptionTest() {
-        CreateGameRequestDTO requestDTO = new CreateGameRequestDTO("Gonza25");
-        when(playerRepository.existsByUsername("Gonza25")).thenReturn(true);
-
-        PlayerAlreadyExistsException exception = assertThrows(
-            PlayerAlreadyExistsException.class,
-            () -> playerService.identifyPlayer(requestDTO)
-        );
-
-        assertEquals("Player with username Gonza25 already exists", exception.getMessage());
-        verify(playerRepository).existsByUsername("Gonza25");
-        verify(playerRepository, never()).save(any(Player.class));
-    }
 }

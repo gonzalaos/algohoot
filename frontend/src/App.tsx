@@ -11,7 +11,7 @@ const App: React.FC = () => {
     <QueryClientProvider client={appQueryClient}>
       <div className='app'>
         <Route path="/" component={Home} />
-        <Route path="/lobby" component={Lobby} />
+        <Route path="/lobby/:gameId" component={Lobby} />
       </div>
     </QueryClientProvider>
   )

@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record CreateGameResponseDTO(
     Long gameId,
-    // String gameCode
-    Long hostPlayerId
+    Long hostPlayerId,
+    String gameCode
 ) {
 }
